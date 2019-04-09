@@ -3,6 +3,11 @@ from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.stem.porter import *
+import math
+import pandas as pd
+from pandas.io.json import json_normalize
+
+stemmer = SnowballStemmer("english")
 
 def bucket_times(data, seconds=30):
     buckets = {}
