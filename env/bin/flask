@@ -1,5 +1,4 @@
-#!/home/nickirichter/Desktop/Spring2019/BigData/studyfast_ml_service_api/env/bin/python
-
+#!/Users/carlcortright/Documents/School/bigdata/studyfast_ml_service_api/env/bin/python3.6
 # -*- coding: utf-8 -*-
 import re
 import sys
