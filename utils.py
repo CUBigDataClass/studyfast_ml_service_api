@@ -6,7 +6,11 @@ from nltk.stem.porter import *
 import math
 import pandas as pd
 from pandas.io.json import json_normalize
+import numpy as np
+import nltk
 
+np.random.seed(1337)
+nltk.download('wordnet')
 stemmer = SnowballStemmer("english")
 
 def bucket_times(data, seconds=30):
