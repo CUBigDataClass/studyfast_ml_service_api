@@ -17,12 +17,12 @@ def model(video_id):
 	try:
 		data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 	except YouTubeTranscriptApi.CouldNotRetrieveTranscript:
-		app.logger.info(f"request failed on transcript lookup, video_id={video_id}")
+		app.logger.exception(f"request failed on transcript lookup, video_id={video_id}")
 		return jsonify({'error':{'code': NO_TRANSCRIPT_ERROR, 'message':'transcript could not be retrieved'}})
 	try:
 		buckets = partition(data, search)
 	except Exception:
-		app.logger.info(f"video processing failed with exception")
+		app.logger.exception(f"video processing failed with exception")
 		return jsonify({'error':{'code': VIDEO_PROCESSING_ERROR, 'message':'error processing video'}})
 	payload = {
 		"video_id": video_id,
