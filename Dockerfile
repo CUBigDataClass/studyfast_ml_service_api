@@ -7,4 +7,4 @@ ADD . /app
 
 # Install requirements and run
 RUN pip install -r requirements.txt
-CMD ["gunicorn","-w","10","-b","0.0.0.0:80","--threads","1","server:app"]
+CMD ["gunicorn","-w","1","-b","0.0.0.0:80","--threads","1","server:app"]
