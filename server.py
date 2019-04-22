@@ -27,7 +27,7 @@ def model(video_id):
 	payload = {
 		"video_id": video_id,
 		"search": search_param,
-		"buckets": buckets
+		"segments": buckets
 	}
 	return jsonify(payload)
 
