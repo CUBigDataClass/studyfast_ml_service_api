@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 @app.route('/video/<video_id>')
 def model(video_id):
-	search = request.args.get('search')
-	if not search:
+	search_param = request.args.get('search')
+	if not search_param:
 		app.logger.info("request failed without search parameter")
 		return jsonify({'error':{'code': INVALID_PARAMS_ERROR, 'message':'search parameter required on request'}})
 	try:
@@ -20,13 +20,13 @@ def model(video_id):
 		app.logger.exception(f"request failed on transcript lookup, video_id={video_id}")
 		return jsonify({'error':{'code': NO_TRANSCRIPT_ERROR, 'message':'transcript could not be retrieved'}})
 	try:
-		buckets = partition(data, search)
+		buckets = partition(data, search_param)
 	except Exception:
 		app.logger.exception(f"video processing failed with exception")
 		return jsonify({'error':{'code': VIDEO_PROCESSING_ERROR, 'message':'error processing video'}})
 	payload = {
 		"video_id": video_id,
-		"search": search,
+		"search": search_param,
 		"buckets": buckets
 	}
 	return jsonify(payload)
