@@ -34,17 +34,17 @@ def model(video_id):
 
 @app.route('/valid_transcript/<video_id>')
 def valid_transcript(video_id):
-    """ This endpoint allows us to distribute the requests testing if a video has a
-        a transcript across multiple IPs. The open, undocumented API that youtube provides
-        rate limits our requests from a single IP. When this code is running in the cluster
-        we can use it to quickly determine which videos can be modeled.
-    """
-    try:
+	""" This endpoint allows us to distribute the requests testing if a video has a
+		a transcript across multiple IPs. The open, undocumented API that youtube provides
+		rate limits our requests from a single IP. When this code is running in the cluster
+		we can use it to quickly determine which videos can be modeled.
+	"""
+	try:
 		data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 	except YouTubeTranscriptApi.CouldNotRetrieveTranscript:
 		app.logger.exception(f"request failed on transcript lookup, video_id={video_id}")
 		return jsonify({'transcript': False})
-    return jsonify({'transcript': True})
+	return jsonify({'transcript': True})
 
 
 
