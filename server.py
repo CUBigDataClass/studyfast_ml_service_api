@@ -3,22 +3,23 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from trainModel import partition
 from cassandra.cluster import Cluster
 import json
+import os
 
+
+SERVER_PORT=os.getenv('CASSANDRA_IP', '127.0.0.1')
 
 NO_TRANSCRIPT_ERROR=1
 INVALID_PARAMS_ERROR=2
 VIDEO_PROCESSING_ERROR=3
 
 app = Flask(__name__)
-cluster = Cluster()
-#cluster = Cluster()
+cluster = Cluster([SERVER_PORT])
 
 def getTranscript(vID):
     try:
         session = cluster.connect('cache')
         row = session.execute('SELECT transcript FROM videos WHERE videoID=%s',(vID,))
-        print(row[0].transcript)
-        print('Data from Cassandra')
+        print('Data from Cache')
         data = json.loads(row[0].transcript)
     except Exception as e:
         print(e)
