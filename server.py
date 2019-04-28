@@ -1,12 +1,40 @@
 from flask import Flask, jsonify, request
 from youtube_transcript_api import YouTubeTranscriptApi
 from trainModel import partition
+from cassandra.cluster import Cluster
+import json
+
 
 NO_TRANSCRIPT_ERROR=1
 INVALID_PARAMS_ERROR=2
 VIDEO_PROCESSING_ERROR=3
 
 app = Flask(__name__)
+cluster = Cluster()
+#cluster = Cluster()
+
+def getTranscript(vID):
+    try:
+        session = cluster.connect('cache')
+        row = session.execute('SELECT transcript FROM videos WHERE videoID=%s',(vID,))
+        print(row[0].transcript)
+        print('Data from Cassandra')
+        data = json.loads(row[0].transcript)
+    except Exception as e:
+        print(e)
+        data = YouTubeTranscriptApi.get_transcript(vID, languages=["en"])
+        try:
+            session = cluster.connect('cache')
+            session.execute('INSERT INTO videos (videoID, transcript) VALUES (%s,%s)', (vID, json.dumps(data)))
+        except Exception as i:
+            print(i)
+
+
+    return data
+
+
+
+
 
 @app.route('/video/<video_id>')
 def model(video_id):
@@ -15,7 +43,8 @@ def model(video_id):
 		app.logger.info("request failed without search parameter")
 		return jsonify({'error':{'code': INVALID_PARAMS_ERROR, 'message':'search parameter required on request'}})
 	try:
-		data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+                data = getTranscript(video_id)
+		#data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 	except YouTubeTranscriptApi.CouldNotRetrieveTranscript:
 		app.logger.exception(f"request failed on transcript lookup, video_id={video_id}")
 		return jsonify({'error':{'code': NO_TRANSCRIPT_ERROR, 'message':'transcript could not be retrieved'}})
@@ -40,7 +69,8 @@ def valid_transcript(video_id):
 		we can use it to quickly determine which videos can be modeled.
 	"""
 	try:
-		data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+                data = getTranscript(video_id)
+		#data = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 	except YouTubeTranscriptApi.CouldNotRetrieveTranscript:
 		app.logger.exception(f"request failed on transcript lookup, video_id={video_id}")
 		return jsonify({'transcript': False})
