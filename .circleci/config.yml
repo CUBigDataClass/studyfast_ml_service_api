@@ -4,4 +4,6 @@ jobs:
    machine: true
    steps:
      # build the application image
+     - checkout
+     - setup_remote_docker
      - run: docker build .
