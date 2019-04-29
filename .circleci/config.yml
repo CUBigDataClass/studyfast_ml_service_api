@@ -1,6 +1,7 @@
 version: 2.1
 jobs:
  build:
+   docker: true
    steps:
      # build the application image
      - checkout
